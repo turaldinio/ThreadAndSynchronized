@@ -1,3 +1,4 @@
+import java.net.Socket;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -5,24 +6,25 @@ public class Main {
     private final static Map<Integer, Integer> sizeToFreq = new HashMap<>();
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         List<Thread> list = new ArrayList<>();
+        Thread sortThread = new Thread(() -> {
+            while (!Thread.interrupted()) {
+
+                sortMap();
+            }
+        });
+        sortThread.start();
+
         for (int a = 0; a < 100; a++) {
             list.add(new Thread(() -> {
+
                 putInMap(numberOfRepetitions(generateRoute("RLRFR", 100)));
             }));
         }
 
         list.forEach(Thread::start);
-
-        Thread sortThread = new Thread(() -> {
-            while (!Thread.interrupted()) {
-                sortMap();
-
-            }
-        });
-        sortThread.start();
 
 
         list.forEach(x -> {
@@ -48,6 +50,7 @@ public class Main {
 
     public static void putInMap(int count) {
         synchronized (sizeToFreq) {
+
             sizeToFreq.merge(count, 1, Integer::sum);
             sizeToFreq.notify();
         }
@@ -61,7 +64,7 @@ public class Main {
                 try {
                     sizeToFreq.wait();
                 } catch (InterruptedException e) {
-                    return;
+                    e.printStackTrace();
                 }
             }
             sizeToFreq.entrySet().stream()
