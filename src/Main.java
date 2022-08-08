@@ -1,6 +1,4 @@
-import java.net.Socket;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
     private final static Map<Integer, Integer> sizeToFreq = new HashMap<>();
